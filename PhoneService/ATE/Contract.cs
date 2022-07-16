@@ -1,6 +1,6 @@
 ﻿namespace PhoneService.ATE
 {
-    internal class Contract
+    internal class ContractInformation
     {
         public Guid Id { get; set; }
         public int PhoneNumber { get; set; }
@@ -9,7 +9,7 @@
         public DateTime EndCall { get; set; }
         public int Amount { get; set; }
 
-        public Contract(int phoneNumber, int targetPhoneNumber, DateTime startCall)
+        public ContractInformation(int phoneNumber, int targetPhoneNumber, DateTime startCall)
         {
             Id = Guid.NewGuid();
             PhoneNumber = phoneNumber;

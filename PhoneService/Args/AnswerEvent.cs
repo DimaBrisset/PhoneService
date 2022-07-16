@@ -9,6 +9,10 @@ namespace PhoneService.Args
         public int TargetPhoneNumber { get; set; }
 
         public StatusCall CallStatus;
+        private int number;
+        private object targetNumber;
+        private object state;
+
         public AnswerEvent(Guid id, int phoneNumber, int targetPhoneNumber, StatusCall callStatus)
         {
             Id = id;
@@ -17,14 +21,15 @@ namespace PhoneService.Args
             CallStatus = callStatus;
         }
 
-        public AnswerEvent(int phoneNumber, int targetPhoneNumber, StatusCall callStatus)
+        public AnswerEvent(int phoneNumber, int targetPhoneNumber, StatusCall callStatus,Guid id)
         {
          
             PhoneNumber = phoneNumber;
             TargetPhoneNumber = targetPhoneNumber;
             CallStatus = callStatus;
+            Id = id;
         }
 
-
+        
     }
 }
