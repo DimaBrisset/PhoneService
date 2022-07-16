@@ -1,4 +1,4 @@
-﻿namespace PhoneService
+﻿namespace PhoneService.ATE
 {
     internal class Program
     {

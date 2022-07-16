@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhoneService
+namespace PhoneService.Enum
 {
-    internal class Port
+    internal enum StatusCall
     {
+        Answer,
+        Reject
     }
 }
