@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace PhoneService.Args
 {
-    internal class CallEvent : EventArgs
+    internal class CallEventARGS : EventArgs
     {
         public Guid Id { get; set; }
         public int PhoneNumber { get; set; }
         public int TargetPhoneNumber { get; set; }
 
 
-        public CallEvent(int phoneNumber, int targetPhoneNumeber)
+        public CallEventARGS(int phoneNumber, int targetPhoneNumeber)
         {
             PhoneNumber = phoneNumber;
             TargetPhoneNumber = targetPhoneNumeber;
         }
-        public CallEvent(int phoneNmber, int targetPhoneNumeber, Guid id)
+        public CallEventARGS(int phoneNumber, int targetPhoneNumeber, Guid id)
         {
-            PhoneNumber = phoneNmber;
+            PhoneNumber = phoneNumber;
             TargetPhoneNumber = targetPhoneNumeber;
             Id = id;
         }

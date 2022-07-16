@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace PhoneService.Args
 {
-    internal class EndEvent : EventArgs
+    internal class EndEventARGS : EventArgs
     {
         public Guid Id { get; set; }
         public int PhoneNumber { get; set; }
         public int TargetPhoneNumber { get; set; }
 
 
-        public EndEvent(Guid id, int phoneNumber)
+        public EndEventARGS(Guid id, int phoneNumber)
         {
             Id = id;
             PhoneNumber = phoneNumber;

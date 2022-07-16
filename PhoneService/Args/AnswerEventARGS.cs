@@ -2,7 +2,7 @@
 
 namespace PhoneService.Args
 {
-    internal class AnswerEvent:EventArgs
+    internal class AnswerEventARGS:EventArgs
     {
         public Guid Id { get; set; }
         public int PhoneNumber { get; set; }
@@ -13,15 +13,15 @@ namespace PhoneService.Args
         private object targetNumber;
         private object state;
 
-        public AnswerEvent(Guid id, int phoneNumber, int targetPhoneNumber, StatusCall callStatus)
+        public AnswerEventARGS(int phoneNumber, int targetPhoneNumber, StatusCall callStatus)
         {
-            Id = id;
+          
             PhoneNumber = phoneNumber;
             TargetPhoneNumber = targetPhoneNumber;
             CallStatus = callStatus;
         }
 
-        public AnswerEvent(int phoneNumber, int targetPhoneNumber, StatusCall callStatus,Guid id)
+        public AnswerEventARGS(int phoneNumber, int targetPhoneNumber, StatusCall callStatus,Guid id)
         {
          
             PhoneNumber = phoneNumber;
