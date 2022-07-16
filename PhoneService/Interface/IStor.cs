@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhoneService
+namespace PhoneService.Interface
 {
-    internal interface IStor<T>
+    public interface IStor<T>
     {
         IList<T> ListInformation();
     }

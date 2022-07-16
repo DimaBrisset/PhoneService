@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace PhoneService.ATE
 {
-    internal class Port
+    public class Port
     {
         public StatusPort PortStatus;
         public bool IsConnected;
+
         public event EventHandler<CallEventARGS> CallEvent;
         public event EventHandler<AnswerEventARGS> AnswerEvent;
         public event EventHandler<EndEventARGS> EndEvent;
-
+       
         public event EventHandler<CallEventARGS> PortCallEvent;
         public event EventHandler<AnswerEventARGS> PortAnswerEvent;
 
@@ -87,7 +88,7 @@ namespace PhoneService.ATE
             EventEndCall(e.Id, e.PhoneNumber);
         }
 
-        public bool Disconected(Terminal terminal)
+        public bool Disconnect(Terminal terminal)
         {
             if (PortStatus == StatusPort.Connect)
             {

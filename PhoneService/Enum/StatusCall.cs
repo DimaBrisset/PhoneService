@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PhoneService.Enum
 {
-    internal enum StatusCall
+    public enum StatusCall
     {
         Answer,
         Reject

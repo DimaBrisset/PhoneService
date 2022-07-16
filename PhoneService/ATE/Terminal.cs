@@ -3,7 +3,7 @@ using PhoneService.Enum;
 
 namespace PhoneService.ATE
 {
-    internal class Terminal
+    public class Terminal
     {
         private int _number;
         private Port _port;
@@ -27,7 +27,10 @@ namespace PhoneService.ATE
             _port = port;
 
         }
-        protected virtual void EventEnd(Guid id)
+     
+
+
+        public virtual void EventEnd(Guid id)
         {
             EndEvent?.Invoke(this, new EndEventARGS(id, _number));
         }
@@ -35,7 +38,7 @@ namespace PhoneService.ATE
         {
             CallEvent?.Invoke(this, new CallEventARGS(_number, targetPhoneNumber));
         }
-        protected virtual void EventAnswer(int targetPhoneNumber, StatusCall statusCall, Guid id)
+        public virtual void EventAnswer(int targetPhoneNumber, StatusCall statusCall, Guid id)
         {
             AnswerEvent?.Invoke(this, new AnswerEventARGS(_number, targetPhoneNumber, statusCall, id));
         }
@@ -50,7 +53,59 @@ namespace PhoneService.ATE
             EventEnd(_id);
         }
 
+        public void PickUpPhone(object sender, AnswerEventARGS e)// TakeAnswer
+        {
+            _id = e.Id;
+            if (e.CallStatus == StatusCall.Answer)
+            {
+                Console.WriteLine($"Номер: {e.PhoneNumber}, отвечает: {e.TargetPhoneNumber}");
+            }
+            else
+            {
+                Console.WriteLine($"Сбросил звонок: {e.PhoneNumber}");
+            }
+        }
+        public void CallAnswered(int targetPhoneNumber, StatusCall statusCall, Guid id)//AnswerToCall
+        {
+            EventAnswer(targetPhoneNumber, statusCall, id);
+        }
+        public void TakeIncomingCall(object sender, CallEventARGS e)
+        {
+            bool isConnect = true;
+            _id = e.Id;
+            Console.WriteLine($"Звонит: {e.PhoneNumber} на номер {e.TargetPhoneNumber}");
+            while (isConnect == true)
+            {
+                Console.WriteLine("Ответить? y/n");
+                char key = Console.ReadKey().KeyChar;
+                if (key == 'y')
+                {
+                    isConnect = false;
+                    Console.WriteLine();
+                    EventAnswer(e.PhoneNumber, StatusCall.Answer, e.Id);
+                }
+                else if (key == 'n')
+                {
+                    isConnect = false;
+                    Console.WriteLine();
+                    EndCall();
+                }
+                else
+                {
+                    isConnect = true;
+                    Console.WriteLine();
+                }
+            }
+        }
+        public void ConnectedPort()
+        {
+            if (_port.Connect(this))
+            {
+                _port.CallEvent += TakeIncomingCall;
+                _port.PortAnswerEvent += PickUpPhone;
 
+            }
+        }
 
     }
 }

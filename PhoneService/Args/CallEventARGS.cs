@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PhoneService.Args
 {
-    internal class CallEventARGS : EventArgs
+    public class CallEventARGS : EventArgs,ICallARGS
     {
         public Guid Id { get; set; }
         public int PhoneNumber { get; set; }

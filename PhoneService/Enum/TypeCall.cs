@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PhoneService.Enum
 {
-    internal enum TypeCall
+    public enum TypeCall
     {
         CallIncoming,
         CallOutgoing
