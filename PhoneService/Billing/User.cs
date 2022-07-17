@@ -5,10 +5,10 @@
         public string Name { get; private set; }
         public int Balance { get; private set; }
 
-        public User(string name, int balance)
+        public User(string name)
         {
             Name = name;
-            Balance = balance;
+            Balance = 100;
         }
 
         public void BalanceAdd(int balance)

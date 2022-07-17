@@ -9,7 +9,7 @@ namespace PhoneService.Args
         public int TargetPhoneNumber { get; set; }
 
         public StatusCall CallStatus;
-        private int number;
+     
      
 
         public AnswerEventARGS(int phoneNumber, int targetPhoneNumber, StatusCall callStatus)
