@@ -6,12 +6,12 @@
         public PortState State;
         public bool Flag;
 
-        public event EventHandler<CallEventArgs> CallPortEvent;
-        public event EventHandler<AnswerEventArgs> AnswerPortEvent;
-        public event EventHandler<CallEventArgs> CallEvent;
-        public event EventHandler<AnswerEventArgs> AnswerEvent;
+        public event EventHandler<CallEventArgs>? CallPortEvent;
+        public event EventHandler<AnswerEventArgs>? AnswerPortEvent;
+        public event EventHandler<CallEventArgs>? CallEvent;
+        public event EventHandler<AnswerEventArgs>? AnswerEvent;
 
-        public event EventHandler<EndCallEventArgs> EndCallEvent;
+        public event EventHandler<EndCallEventArgs>? EndCallEvent;
 
         public Port()
         {
@@ -46,72 +46,51 @@
 
         protected virtual void RaiseIncomingCallEvent(int number, int targetNumber)
         {
-            if (CallPortEvent != null)
-            {
-                CallPortEvent(this, new CallEventArgs(number, targetNumber));
-            }
+            CallPortEvent?.Invoke(this, new CallEventArgs(number, targetNumber));
         }
         protected virtual void RaiseIncomingCallEvent(int number, int targetNumber, Guid id)
         {
-            if (CallPortEvent != null)
-            {
-                CallPortEvent(this, new CallEventArgs(number, targetNumber, id));
-            }
+            CallPortEvent?.Invoke(this, new CallEventArgs(number, targetNumber, id));
         }
         protected virtual void RaiseAnswerCallEvent(int number, int targetNumber, CallState state)
         {
-            if (AnswerPortEvent != null)
-            {
-                AnswerPortEvent(this, new AnswerEventArgs(number, targetNumber, state));
-            }
+            AnswerPortEvent?.Invoke(this, new AnswerEventArgs(number, targetNumber, state));
         }
         protected virtual void RaiseAnswerCallEvent(int number, int targetNumber, CallState state, Guid id)
         {
-            if (AnswerPortEvent != null)
-            {
-                AnswerPortEvent(this, new AnswerEventArgs(number, targetNumber, state, id));
-            }
+            AnswerPortEvent?.Invoke(this, new AnswerEventArgs(number, targetNumber, state, id));
         }
 
         protected virtual void RaiseCallingToEvent(int number, int targetNumber)
         {
-            if (CallEvent != null)
-            {
-                CallEvent(this, new CallEventArgs(number, targetNumber));
-            }
+            CallEvent?.Invoke(this, new CallEventArgs(number, targetNumber));
         }
 
         protected virtual void RaiseAnswerToEvent(AnswerEventArgs eventArgs)
         {
-            if (AnswerEvent != null)
-            {
-                AnswerEvent(this, new AnswerEventArgs(
-                    eventArgs.TelephoneNumber,
-                    eventArgs.TargetTelephoneNumber,
-                    eventArgs.StateInCall,
-                    eventArgs.Id));
-            }
+            AnswerEvent?.Invoke(this, new AnswerEventArgs(
+    eventArgs.TelephoneNumber,
+    eventArgs.TargetTelephoneNumber,
+    eventArgs.StateInCall,
+    eventArgs.Id));
         }
 
         protected virtual void RaiseEndCallEvent(Guid id, int number)
         {
-            if (EndCallEvent != null)
-            {
-                EndCallEvent(this, new EndCallEventArgs(id, number));
-            }
+            EndCallEvent?.Invoke(this, new EndCallEventArgs(id, number));
         }
 
-        private void CallingTo(object sender, CallEventArgs e)
+        private void CallingTo(object? sender, CallEventArgs e)
         {
             RaiseCallingToEvent(e.TelephoneNumber, e.TargetTelephoneNumber);
         }
 
-        private void AnswerTo(object sender, AnswerEventArgs e)
+        private void AnswerTo(object? sender, AnswerEventArgs e)
         {
             RaiseAnswerToEvent(e);
         }
 
-        private void EndCall(object sender, EndCallEventArgs e)
+        private void EndCall(object? sender, EndCallEventArgs e)
         {
             RaiseEndCallEvent(e.Id, e.TelephoneNumber);
         }

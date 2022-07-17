@@ -3,8 +3,8 @@ namespace PhoneService
 {
     public class ATE : IATE
     {
-        private IDictionary<int, Tuple<Port, IContract>> _usersData;
-        private IList<CallInformation> _callList = new List<CallInformation>();
+        private readonly IDictionary<int, Tuple<Port, IContract>> _usersData;
+        private readonly IList<CallInformation> _callList = new List<CallInformation>();
         public ATE()
         {
             _usersData = new Dictionary<int, Tuple<Port, IContract>>();
@@ -28,12 +28,12 @@ namespace PhoneService
             return contract;
         }
 
-        public void CallingTo(object sender, ICallingEventArgs e)
+        public void CallingTo(object? sender, ICallingEventArgs e)
         {
             if ((_usersData.ContainsKey(e.TargetTelephoneNumber) && e.TargetTelephoneNumber != e.TelephoneNumber)
                 || e is EndCallEventArgs)
             {
-                CallInformation inf = null;
+                CallInformation? inf = null;
                 Port targetPort;
                 Port port;
                 int number = 0;
@@ -68,11 +68,8 @@ namespace PhoneService
                     var tuple = _usersData[number];
                     var targetTuple = _usersData[targetNumber];
 
-                    if (e is AnswerEventArgs)
+                    if (e is AnswerEventArgs answerArgs)
                     {
-
-                        var answerArgs = (AnswerEventArgs)e;
-
                         if (!answerArgs.Id.Equals(Guid.Empty) && _callList.Any(x => x.Id.Equals(answerArgs.Id)))
                         {
                             inf = _callList.First(x => x.Id.Equals(answerArgs.Id));
@@ -87,11 +84,11 @@ namespace PhoneService
                             targetPort.AnswerCall(answerArgs.TelephoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall);
                         }
                     }
-                    if (e is CallEventArgs)
+                    if (e is CallEventArgs args)
                     {
                         if (tuple.Item2.Subscriber.Money > tuple.Item2.Tariff.CostOfCallPerMinute)
                         {
-                            var callArgs = (CallEventArgs)e;
+                            var callArgs = args;
 
                             if (callArgs.Id.Equals(Guid.Empty))
                             {
@@ -121,15 +118,14 @@ namespace PhoneService
 
                         }
                     }
-                    if (e is EndCallEventArgs)
+                    if (e is EndCallEventArgs args1)
                     {
-                        var args = (EndCallEventArgs)e;
-                        inf = _callList.First(x => x.Id.Equals(args.Id));
+                        inf = _callList.First(x => x.Id.Equals(args1.Id));
                         inf.EndCall = DateTime.Now;
                         var sumOfCall = tuple.Item2.Tariff.CostOfCallPerMinute * TimeSpan.FromTicks((inf.EndCall - inf.BeginCall).Ticks).TotalMinutes;
                         inf.Cost = (int)sumOfCall;
                         targetTuple.Item2.Subscriber.RemoveMoney(inf.Cost);
-                        targetPort.AnswerCall(args.TelephoneNumber, args.TargetTelephoneNumber, CallState.Rejected, inf.Id);
+                        targetPort.AnswerCall(args1.TelephoneNumber, args1.TargetTelephoneNumber, CallState.Rejected, inf.Id);
                     }
                 }
             }
