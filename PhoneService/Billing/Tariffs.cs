@@ -1,46 +1,42 @@
-﻿using PhoneService.Enum;
-
-namespace PhoneService.Billing
+﻿namespace PhoneService
 {
-   public class Tariffs
+    public class Tariff
     {
-        public int AmountMonth { get;  set; }
-        public int AmountMinute { get; set; }
-        public int LimitedOfMonth { get;  set; }
-        public TypeTariff TypeTariff { get; set; }
-
-
-        public Tariffs(TypeTariff type)
+        public int CostOfMonth { get; private set; }
+        public int CostOfCallPerMinute { get; private set; }
+        public int LimitCallInMonth { get; private set; }
+        public TariffType TariffType { get; private set; }
+        public Tariff(TariffType type)
         {
-            TypeTariff = type;
-            switch (TypeTariff)
+            TariffType = type;
+            switch (TariffType)
             {
-                case TypeTariff.StartTariff:
+                case TariffType.Light:
                     {
-                        AmountMonth = 100;
-                        AmountMinute = 10;
-                        LimitedOfMonth = 5;
+                        CostOfMonth = 10;
+                        LimitCallInMonth = 4;
+                        CostOfCallPerMinute = 3;
                         break;
                     }
-                case TypeTariff.StandardTariff:
+                case TariffType.Standart:
                     {
-                        AmountMonth = 200;
-                        AmountMinute = 20;
-                        LimitedOfMonth = 5;
+                        CostOfMonth = 20;
+                        LimitCallInMonth = 8;
+                        CostOfCallPerMinute = 2;
                         break;
                     }
-                case TypeTariff.UltraTariff:
+                case TariffType.Pro:
                     {
-                        AmountMonth = 300;
-                        AmountMinute = 30;
-                        LimitedOfMonth = 5;
+                        CostOfMonth = 30;
+                        LimitCallInMonth = 12;
+                        CostOfCallPerMinute = 1;
                         break;
                     }
                 default:
                     {
-                        AmountMonth = 0;
-                        AmountMinute = 0;
-                        LimitedOfMonth = 0;
+                        CostOfMonth = 0;
+                        LimitCallInMonth = 0;
+                        CostOfCallPerMinute = 0;
                         break;
                     }
             }

@@ -1,29 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PhoneService.Args
+﻿namespace PhoneService
 {
-    public class CallEventARGS : EventArgs,ICallARGS
+    public class CallEventArgs : EventArgs, ICallingEventArgs
     {
-        public Guid Id { get; set; }
-        public int PhoneNumber { get; set; }
-        public int TargetPhoneNumber { get; set; }
-
-
-        public CallEventARGS(int phoneNumber, int targetPhoneNumeber)
+        public int TelephoneNumber { get; private set; }
+        public int TargetTelephoneNumber { get; private set; }
+        public Guid Id { get; private set; }
+        public CallEventArgs(int number, int target)
         {
-            PhoneNumber = phoneNumber;
-            TargetPhoneNumber = targetPhoneNumeber;
+            TelephoneNumber = number;
+            TargetTelephoneNumber = target;
         }
-        public CallEventARGS(int phoneNumber, int targetPhoneNumeber, Guid id)
+        public CallEventArgs(int number, int target, Guid id)
         {
-            PhoneNumber = phoneNumber;
-            TargetPhoneNumber = targetPhoneNumeber;
+            TelephoneNumber = number;
+            TargetTelephoneNumber = target;
             Id = id;
         }
-
     }
 }

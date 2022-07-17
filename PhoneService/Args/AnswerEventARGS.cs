@@ -1,34 +1,25 @@
-﻿using PhoneService.Enum;
-
-namespace PhoneService.Args
+﻿namespace PhoneService
 {
-    public class AnswerEventARGS:EventArgs,ICallARGS
+    public class AnswerEventArgs : EventArgs, ICallingEventArgs
     {
-        public Guid Id { get; set; }
-        public int PhoneNumber { get; set; }
-        public int TargetPhoneNumber { get; set; }
-
-        public StatusCall CallStatus;
-     
-     
-
-        public AnswerEventARGS(int phoneNumber, int targetPhoneNumber, StatusCall callStatus)
+        public int TelephoneNumber { get; private set; }
+        public int TargetTelephoneNumber { get; private set; }
+        public CallState StateInCall;
+        public Guid Id { get; private set; }
+        public AnswerEventArgs(int number, int target, CallState state)
         {
-          
-            PhoneNumber = phoneNumber;
-            TargetPhoneNumber = targetPhoneNumber;
-            CallStatus = callStatus;
+            TelephoneNumber = number;
+            TargetTelephoneNumber = target;
+            StateInCall = state;
         }
-
-        public AnswerEventARGS(int phoneNumber, int targetPhoneNumber, StatusCall callStatus,Guid id)
+        public AnswerEventArgs(int number, int target, CallState state, Guid id)
         {
-         
-            PhoneNumber = phoneNumber;
-            TargetPhoneNumber = targetPhoneNumber;
-            CallStatus = callStatus;
+            TelephoneNumber = number;
+            TargetTelephoneNumber = target;
+            StateInCall = state;
             Id = id;
         }
 
-        
+
     }
 }

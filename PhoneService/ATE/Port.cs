@@ -1,118 +1,137 @@
-﻿using PhoneService.Args;
-using PhoneService.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PhoneService.ATE
+﻿namespace PhoneService
 {
+
     public class Port
     {
-        public StatusPort PortStatus;
-        public bool IsConnected;
+        public PortState State;
+        public bool Flag;
 
-        public event EventHandler<CallEventARGS> CallEvent;
-        public event EventHandler<AnswerEventARGS> AnswerEvent;
-        public event EventHandler<EndEventARGS> EndEvent;
-       
-        public event EventHandler<CallEventARGS> PortCallEvent;
-        public event EventHandler<AnswerEventARGS> PortAnswerEvent;
+        public event EventHandler<CallEventArgs> CallPortEvent;
+        public event EventHandler<AnswerEventArgs> AnswerPortEvent;
+        public event EventHandler<CallEventArgs> CallEvent;
+        public event EventHandler<AnswerEventArgs> AnswerEvent;
+
+        public event EventHandler<EndCallEventArgs> EndCallEvent;
 
         public Port()
         {
-            PortStatus = StatusPort.Disconnect;
+            State = PortState.Disconnect;
         }
 
-        public virtual void EventCalling(int number, int targetPhoneNumber)
+        public bool Connect(Terminal terminal)
         {
-            CallEvent?.Invoke(this, new CallEventARGS(number, targetPhoneNumber));
-        }
-        public virtual void EventEndCall(Guid id, int number)
-        {
-            EndEvent?.Invoke(this, new EndEventARGS(id, number));
-        }
-        public virtual void EventInCall(int number, int targetPhoneNumber)
-        {
-            PortCallEvent?.Invoke(this, new CallEventARGS(number, targetPhoneNumber));
-        }
-        public virtual void EventInCall(int number, int targetPhoneNumber, Guid id)
-        {
-            PortCallEvent?.Invoke(this, new CallEventARGS(number, targetPhoneNumber, id));
-        }
-        public virtual void EventAnswerCall(int number, int targetPhoneNumber, StatusCall statusCall)
-        {
-            PortAnswerEvent?.Invoke(this, new AnswerEventARGS(number, targetPhoneNumber, statusCall));
-        }
-        public virtual void EventAnswerCall(int number, int targetPhoneNumber, StatusCall statusCall, Guid id)
-        {
-            PortAnswerEvent?.Invoke(this, new AnswerEventARGS(number, targetPhoneNumber, statusCall, id));
-        }
-        protected virtual void EventAnswer(AnswerEventARGS eventARGS)
-        {
-            AnswerEvent?.Invoke(this, new AnswerEventARGS(
-                                 eventARGS.PhoneNumber,
-                                 eventARGS.TargetPhoneNumber,
-                                 eventARGS.CallStatus,
-                                 eventARGS.Id));
-        }
-        public void InCall(int number, int targetPhoneNumber)
-        {
-            EventInCall(number, targetPhoneNumber);
-        }
-        public void InCall(int number, int targetPhoneNumber, Guid id)
-        {
-            EventInCall(number, targetPhoneNumber, id);
-        }
-        public void AnswerCall(int number, int targetPhoneNumber, StatusCall statusCall)
-        {
-            EventAnswerCall(number, targetPhoneNumber, statusCall);
-        }
-        public void AnswerCall(int number, int targetPhoneNumber, StatusCall statusCall, Guid id)
-        {
-            EventAnswerCall(number, targetPhoneNumber, statusCall, id);
-        }
-
-
-        private void CallTo(object sender, CallEventARGS e)
-        {
-            EventCalling(e.PhoneNumber, e.TargetPhoneNumber);
-        }
-        private void AnswerTo(object sender, AnswerEventARGS e)
-        {
-            EventAnswer(e);
-        }
-        private void EndCall(object sender, EndEventARGS e)
-        {
-            EventEndCall(e.Id, e.PhoneNumber);
+            if (State == PortState.Disconnect)
+            {
+                State = PortState.Connect;
+                terminal.CallEvent += CallingTo;
+                terminal.AnswerEvent += AnswerTo;
+                terminal.EndCallEvent += EndCall;
+                Flag = true;
+            }
+            return Flag;
         }
 
         public bool Disconnect(Terminal terminal)
         {
-            if (PortStatus == StatusPort.Connect)
+            if (State == PortState.Connect)
             {
-                PortStatus = StatusPort.Disconnect;
-                terminal.CallEvent -= CallTo;
+                State = PortState.Disconnect;
+                terminal.CallEvent -= CallingTo;
                 terminal.AnswerEvent -= AnswerTo;
-                terminal.EndEvent -= EndCall;
-                IsConnected = false;
-
+                terminal.EndCallEvent -= EndCall;
+                Flag = false;
             }
-            return IsConnected;
+            return false;
         }
-        public bool Connect(Terminal terminal)
-        {
-            if (PortStatus == StatusPort.Disconnect)
-            {
-                PortStatus = StatusPort.Connect;
-                terminal.CallEvent += CallTo;
-                terminal.AnswerEvent += AnswerTo;
-                terminal.EndEvent += EndCall;
-                IsConnected = true;
 
+        protected virtual void RaiseIncomingCallEvent(int number, int targetNumber)
+        {
+            if (CallPortEvent != null)
+            {
+                CallPortEvent(this, new CallEventArgs(number, targetNumber));
             }
-            return IsConnected;
+        }
+        protected virtual void RaiseIncomingCallEvent(int number, int targetNumber, Guid id)
+        {
+            if (CallPortEvent != null)
+            {
+                CallPortEvent(this, new CallEventArgs(number, targetNumber, id));
+            }
+        }
+        protected virtual void RaiseAnswerCallEvent(int number, int targetNumber, CallState state)
+        {
+            if (AnswerPortEvent != null)
+            {
+                AnswerPortEvent(this, new AnswerEventArgs(number, targetNumber, state));
+            }
+        }
+        protected virtual void RaiseAnswerCallEvent(int number, int targetNumber, CallState state, Guid id)
+        {
+            if (AnswerPortEvent != null)
+            {
+                AnswerPortEvent(this, new AnswerEventArgs(number, targetNumber, state, id));
+            }
+        }
+
+        protected virtual void RaiseCallingToEvent(int number, int targetNumber)
+        {
+            if (CallEvent != null)
+            {
+                CallEvent(this, new CallEventArgs(number, targetNumber));
+            }
+        }
+
+        protected virtual void RaiseAnswerToEvent(AnswerEventArgs eventArgs)
+        {
+            if (AnswerEvent != null)
+            {
+                AnswerEvent(this, new AnswerEventArgs(
+                    eventArgs.TelephoneNumber,
+                    eventArgs.TargetTelephoneNumber,
+                    eventArgs.StateInCall,
+                    eventArgs.Id));
+            }
+        }
+
+        protected virtual void RaiseEndCallEvent(Guid id, int number)
+        {
+            if (EndCallEvent != null)
+            {
+                EndCallEvent(this, new EndCallEventArgs(id, number));
+            }
+        }
+
+        private void CallingTo(object sender, CallEventArgs e)
+        {
+            RaiseCallingToEvent(e.TelephoneNumber, e.TargetTelephoneNumber);
+        }
+
+        private void AnswerTo(object sender, AnswerEventArgs e)
+        {
+            RaiseAnswerToEvent(e);
+        }
+
+        private void EndCall(object sender, EndCallEventArgs e)
+        {
+            RaiseEndCallEvent(e.Id, e.TelephoneNumber);
+        }
+
+        public void IncomingCall(int number, int targetNumber)
+        {
+            RaiseIncomingCallEvent(number, targetNumber);
+        }
+        public void IncomingCall(int number, int targetNumber, Guid id)
+        {
+            RaiseIncomingCallEvent(number, targetNumber, id);
+        }
+
+        public void AnswerCall(int number, int targetNumber, CallState state)
+        {
+            RaiseAnswerCallEvent(number, targetNumber, state);
+        }
+        public void AnswerCall(int number, int targetNumber, CallState state, Guid id)
+        {
+            RaiseAnswerCallEvent(number, targetNumber, state, id);
         }
 
 

@@ -1,111 +1,110 @@
-﻿using PhoneService.Args;
-using PhoneService.Enum;
-
-namespace PhoneService.ATE
+﻿namespace PhoneService
 {
     public class Terminal
     {
         private int _number;
-        private Port _port;
-        private Guid _id;
-
-        public event EventHandler<CallEventARGS> CallEvent;
-        public event EventHandler<AnswerEventARGS> AnswerEvent;
-        public event EventHandler<EndEventARGS> EndEvent;
-
         public int Number
         {
-            get { return _number; }
-            set { _number = value; }
+            get
+            {
+                return _number;
+            }
         }
+        private Port _terminalPort;
+        private Guid _id;
 
-
-
+        public event EventHandler<CallEventArgs> CallEvent;
+        public event EventHandler<AnswerEventArgs> AnswerEvent;
+        public event EventHandler<EndCallEventArgs> EndCallEvent;
         public Terminal(int number, Port port)
         {
-            _number = number;
-            _port = port;
-
+            this._number = number;
+            this._terminalPort = port;
         }
-     
-
-
-        public virtual void EventEnd(Guid id)
+        protected virtual void RaiseCallEvent(int targetNumber)
         {
-            EndEvent?.Invoke(this, new EndEventARGS(id, _number));
-        }
-        public virtual void EventCall(int targetPhoneNumber)
-        {
-            CallEvent?.Invoke(this, new CallEventARGS(_number, targetPhoneNumber));
-        }
-        public virtual void EventAnswer(int targetPhoneNumber, StatusCall statusCall, Guid id)
-        {
-            AnswerEvent?.Invoke(this, new AnswerEventARGS(_number, targetPhoneNumber, statusCall, id));
+            if (CallEvent != null)
+                CallEvent(this, new CallEventArgs(_number, targetNumber));
         }
 
-
-        public void Call(int targetPhoneNumber)
+        protected virtual void RaiseAnswerEvent(int targetNumber, CallState state, Guid id)
         {
-            EventCall(targetPhoneNumber);
-        }
-        public void EndCall()
-        {
-            EventEnd(_id);
-        }
-
-        public void PickUpPhone(object sender, AnswerEventARGS e)// TakeAnswer
-        {
-            _id = e.Id;
-            if (e.CallStatus == StatusCall.Answer)
+            if (AnswerEvent != null)
             {
-                Console.WriteLine($"Номер: {e.PhoneNumber}, отвечает: {e.TargetPhoneNumber}");
-            }
-            else
-            {
-                Console.WriteLine($"Сбросил звонок: {e.PhoneNumber}");
+                AnswerEvent(this, new AnswerEventArgs(_number, targetNumber, state, id));
             }
         }
-        public void CallAnswered(int targetPhoneNumber, StatusCall statusCall, Guid id)//AnswerToCall
+
+        protected virtual void RaiseEndCallEvent(Guid id)
         {
-            EventAnswer(targetPhoneNumber, statusCall, id);
+            if (EndCallEvent != null)
+                EndCallEvent(this, new EndCallEventArgs(id, _number));
         }
-        public void TakeIncomingCall(object sender, CallEventARGS e)
+
+        public void Call(int targetNumber)
         {
-            bool isConnect = true;
+            RaiseCallEvent(targetNumber);
+        }
+
+        public void TakeIncomingCall(object sender, CallEventArgs e)
+        {
+            bool flag = true;
             _id = e.Id;
-            Console.WriteLine($"Звонит: {e.PhoneNumber} на номер {e.TargetPhoneNumber}");
-            while (isConnect == true)
+            Console.WriteLine("Have incoming Call at number: {0} to terminal {1}", e.TelephoneNumber, e.TargetTelephoneNumber);
+            while (flag == true)
             {
-                Console.WriteLine("Ответить? y/n");
-                char key = Console.ReadKey().KeyChar;
-                if (key == 'y')
+                Console.WriteLine("Answer? Y/N");
+                char k = Console.ReadKey().KeyChar;
+                if (k == 'Y' || k == 'y')
                 {
-                    isConnect = false;
+                    flag = false;
                     Console.WriteLine();
-                    EventAnswer(e.PhoneNumber, StatusCall.Answer, e.Id);
+                    AnswerToCall(e.TelephoneNumber, CallState.Answered, e.Id);
                 }
-                else if (key == 'n')
+                else if (k == 'N' || k == 'n')
                 {
-                    isConnect = false;
+                    flag = false;
                     Console.WriteLine();
                     EndCall();
                 }
                 else
                 {
-                    isConnect = true;
+                    flag = true;
                     Console.WriteLine();
                 }
             }
         }
-        public void ConnectedPort()
-        {
-            if (_port.Connect(this))
-            {
-                _port.CallEvent += TakeIncomingCall;
-                _port.PortAnswerEvent += PickUpPhone;
 
+        public void ConnectToPort()
+        {
+            if (_terminalPort.Connect(this))
+            {
+                _terminalPort.CallPortEvent += TakeIncomingCall;
+                _terminalPort.AnswerPortEvent += TakeAnswer;
             }
         }
 
+        public void AnswerToCall(int target, CallState state, Guid id)
+        {
+            RaiseAnswerEvent(target, state, id);
+        }
+
+        public void EndCall()
+        {
+            RaiseEndCallEvent(_id);
+        }
+
+        public void TakeAnswer(object sender, AnswerEventArgs e)
+        {
+            _id = e.Id;
+            if (e.StateInCall == CallState.Answered)
+            {
+                Console.WriteLine("Terminal with number: {0}, have answer on call a number: {1}", e.TelephoneNumber, e.TargetTelephoneNumber);
+            }
+            else
+            {
+                Console.WriteLine("Terminal with number: {0}, have rejected call", e.TelephoneNumber);
+            }
+        }
     }
 }

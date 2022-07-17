@@ -1,21 +1,10 @@
-﻿using PhoneService.Billing;
-using PhoneService.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PhoneService.Interface
+﻿namespace PhoneService
 {
     public interface IContract
     {
-        User User { get; }
+        Subscriber Subscriber { get; }
         int Number { get; }
-        Tariffs Tariffs { get; }
-       
-
-        bool ChangeTariff(TypeTariff typeTariff);
-
+        Tariff Tariff { get; }
+        bool ChangeTariff(TariffType tariffType);
     }
 }

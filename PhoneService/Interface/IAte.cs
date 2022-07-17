@@ -1,22 +1,9 @@
-﻿using PhoneService.Args;
-using PhoneService.ATE;
-using PhoneService.Billing;
-using PhoneService.Enum;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PhoneService.Interface
+﻿namespace PhoneService
 {
-    public interface IAte : IStor<ContractInformation>
+    public interface IATE : IStorage<CallInformation>
     {
-        Terminal GetTerminal(IContract contract);
-        IContract RegisterContract(User user, TypeTariff typeTariff);
-        void CallingTo(object sender, ICallARGS e);
-
-
+        Terminal GetNewTerminal(IContract contract);
+        IContract RegisterContract(Subscriber subscriber, TariffType type);
+        void CallingTo(object sender, ICallingEventArgs e);
     }
 }

@@ -1,129 +1,139 @@
-﻿using PhoneService.Args;
-using PhoneService.Billing;
-using PhoneService.Enum;
-using PhoneService.Interface;
-
-
-
-
-
-
-namespace PhoneService.ATE
+﻿
+namespace PhoneService
 {
-    public class Ate : IAte
+    public class ATE : IATE
     {
-        private IList<ContractInformation> _listInformation = new List<ContractInformation>();
         private IDictionary<int, Tuple<Port, IContract>> _usersData;
-
-        public Ate()
+        private IList<CallInformation> _callList = new List<CallInformation>();
+        public ATE()
         {
             _usersData = new Dictionary<int, Tuple<Port, IContract>>();
 
         }
 
-
-        public void CallingTo(object sender, ICallARGS e)
+        public Terminal GetNewTerminal(IContract contract)
         {
-            if ((_usersData.ContainsKey(e.TargetPhoneNumber) && e.TargetPhoneNumber != e.PhoneNumber)
-                || e is EndEventARGS)
+            var newPort = new Port();
+            newPort.AnswerEvent += CallingTo;
+            newPort.CallEvent += CallingTo;
+            newPort.EndCallEvent += CallingTo;
+            _usersData.Add(contract.Number, new Tuple<Port, IContract>(newPort, contract));
+            var newTerminal = new Terminal(contract.Number, newPort);
+            return newTerminal;
+        }
+
+        public IContract RegisterContract(Subscriber subscriber, TariffType type)
+        {
+            var contract = new Contract(subscriber, type);
+            return contract;
+        }
+
+        public void CallingTo(object sender, ICallingEventArgs e)
+        {
+            if ((_usersData.ContainsKey(e.TargetTelephoneNumber) && e.TargetTelephoneNumber != e.TelephoneNumber)
+                || e is EndCallEventArgs)
             {
-                ContractInformation inf = null;
+                CallInformation inf = null;
                 Port targetPort;
                 Port port;
                 int number = 0;
                 int targetNumber = 0;
-                if (e is EndEventARGS)
+                if (e is EndCallEventArgs)
                 {
-                    var callListFirst = _listInformation.First(x => x.Id.Equals(e.Id));
-                    if (callListFirst.PhoneNumber == e.PhoneNumber)
+                    var callListFirst = _callList.First(x => x.Id.Equals(e.Id));
+                    if (callListFirst.MyNumber == e.TelephoneNumber)
                     {
-                        targetPort = _usersData[callListFirst.TargetPhoneNumber].Item1;
-                        port = _usersData[callListFirst.PhoneNumber].Item1;
-                        number = callListFirst.PhoneNumber;
-                        targetNumber = callListFirst.TargetPhoneNumber;
+                        targetPort = _usersData[callListFirst.TargetNumber].Item1;
+                        port = _usersData[callListFirst.MyNumber].Item1;
+                        number = callListFirst.MyNumber;
+                        targetNumber = callListFirst.TargetNumber;
                     }
                     else
                     {
-                        port = _usersData[callListFirst.TargetPhoneNumber].Item1;
-                        targetPort = _usersData[callListFirst.PhoneNumber].Item1;
-                        targetNumber = callListFirst.PhoneNumber;
-                        number = callListFirst.TargetPhoneNumber;
+                        port = _usersData[callListFirst.TargetNumber].Item1;
+                        targetPort = _usersData[callListFirst.MyNumber].Item1;
+                        targetNumber = callListFirst.MyNumber;
+                        number = callListFirst.TargetNumber;
                     }
                 }
                 else
                 {
-                    targetPort = _usersData[e.TargetPhoneNumber].Item1;
-                    port = _usersData[e.PhoneNumber].Item1;
-                    targetNumber = e.TargetPhoneNumber;
-                    number = e.PhoneNumber;
+                    targetPort = _usersData[e.TargetTelephoneNumber].Item1;
+                    port = _usersData[e.TelephoneNumber].Item1;
+                    targetNumber = e.TargetTelephoneNumber;
+                    number = e.TelephoneNumber;
                 }
-                if (targetPort.PortStatus == StatusPort.Connect && port.PortStatus == StatusPort.Connect)
+                if (targetPort.State == PortState.Connect && port.State == PortState.Connect)
                 {
                     var tuple = _usersData[number];
                     var targetTuple = _usersData[targetNumber];
 
-                    if (e is AnswerEventARGS answerArgs)
+                    if (e is AnswerEventArgs)
                     {
-                        if (!answerArgs.Id.Equals(Guid.Empty) && _listInformation.Any(x => x.Id.Equals(answerArgs.Id)))
+
+                        var answerArgs = (AnswerEventArgs)e;
+
+                        if (!answerArgs.Id.Equals(Guid.Empty) && _callList.Any(x => x.Id.Equals(answerArgs.Id)))
                         {
-                            inf = _listInformation.First(x => x.Id.Equals(answerArgs.Id));
+                            inf = _callList.First(x => x.Id.Equals(answerArgs.Id));
                         }
 
                         if (inf != null)
                         {
-                            targetPort.AnswerCall(answerArgs.PhoneNumber, answerArgs.TargetPhoneNumber, answerArgs.CallStatus, inf.Id);
+                            targetPort.AnswerCall(answerArgs.TelephoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall, inf.Id);
                         }
                         else
                         {
-                            targetPort.AnswerCall(answerArgs.PhoneNumber, answerArgs.TargetPhoneNumber, answerArgs.CallStatus);
+                            targetPort.AnswerCall(answerArgs.TelephoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall);
                         }
                     }
-                    if (e is CallEventARGS aRGS)
+                    if (e is CallEventArgs)
                     {
-                        if (tuple.Item2.User.Balance > tuple.Item2.Tariffs.AmountMinute)
+                        if (tuple.Item2.Subscriber.Money > tuple.Item2.Tariff.CostOfCallPerMinute)
                         {
-                            var callArgs = aRGS;
+                            var callArgs = (CallEventArgs)e;
 
                             if (callArgs.Id.Equals(Guid.Empty))
                             {
-                                inf = new ContractInformation(
-                                    callArgs.PhoneNumber,
-                                    callArgs.TargetPhoneNumber,
+                                inf = new CallInformation(
+                                    callArgs.TelephoneNumber,
+                                    callArgs.TargetTelephoneNumber,
                                     DateTime.Now);
-                                _listInformation.Add(inf);
+                                _callList.Add(inf);
                             }
 
-                            if (!callArgs.Id.Equals(Guid.Empty) && _listInformation.Any(x => x.Id.Equals(callArgs.Id)))
+                            if (!callArgs.Id.Equals(Guid.Empty) && _callList.Any(x => x.Id.Equals(callArgs.Id)))
                             {
-                                inf = _listInformation.First(x => x.Id.Equals(callArgs.Id));
+                                inf = _callList.First(x => x.Id.Equals(callArgs.Id));
                             }
                             if (inf != null)
                             {
-                                targetPort.InCall(callArgs.PhoneNumber, callArgs.TargetPhoneNumber, inf.Id);
+                                targetPort.IncomingCall(callArgs.TelephoneNumber, callArgs.TargetTelephoneNumber, inf.Id);
                             }
                             else
                             {
-                                targetPort.InCall(callArgs.PhoneNumber, callArgs.TargetPhoneNumber);
+                                targetPort.IncomingCall(callArgs.TelephoneNumber, callArgs.TargetTelephoneNumber);
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Terminal with number {0} is not enough money in the account!", e.TargetPhoneNumber);
+                            Console.WriteLine("Terminal with number {0} is not enough money in the account!", e.TelephoneNumber);
 
                         }
                     }
-                    if (e is EndEventARGS args)
+                    if (e is EndCallEventArgs)
                     {
-                        inf = _listInformation.First(x => x.Id.Equals(args.Id));
+                        var args = (EndCallEventArgs)e;
+                        inf = _callList.First(x => x.Id.Equals(args.Id));
                         inf.EndCall = DateTime.Now;
-                        var sumOfCall = tuple.Item2.Tariffs.AmountMinute * TimeSpan.FromTicks((inf.EndCall - inf.StartCall).Ticks).TotalMinutes;
-                        inf.Amount = (int)sumOfCall;
-                        targetTuple.Item2.User.BalanceWithdraw(inf.Amount);
-                        targetPort.AnswerCall(args.PhoneNumber, args.TargetPhoneNumber, StatusCall.Reject, inf.Id);
+                        var sumOfCall = tuple.Item2.Tariff.CostOfCallPerMinute * TimeSpan.FromTicks((inf.EndCall - inf.BeginCall).Ticks).TotalMinutes;
+                        inf.Cost = (int)sumOfCall;
+                        targetTuple.Item2.Subscriber.RemoveMoney(inf.Cost);
+                        targetPort.AnswerCall(args.TelephoneNumber, args.TargetTelephoneNumber, CallState.Rejected, inf.Id);
                     }
                 }
             }
-            else if (!_usersData.ContainsKey(e.TargetPhoneNumber))
+            else if (!_usersData.ContainsKey(e.TargetTelephoneNumber))
             {
                 Console.WriteLine("You have calling a non-existent number!!!");
             }
@@ -133,44 +143,9 @@ namespace PhoneService.ATE
             }
         }
 
-
-
-
-
-
-
-
-
-        public Terminal GetTerminal(IContract contract)
+        public IList<CallInformation> GetInfoList()
         {
-            Port port = new();
-            port.AnswerEvent += CallingTo;
-            port.CallEvent += CallingTo;
-            port.EndEvent += CallingTo;
-            _usersData.Add(contract.Number, new Tuple<Port, IContract>(port, contract));
-            var newTerminal = new Terminal(contract.Number, port);
-            return newTerminal;
-
+            return _callList;
         }
-
-      
-
-        public IList<ContractInformation> ListInformation()
-        {
-            return _listInformation;
-        }
-
-    
-
-
-        public IContract RegisterContract(User user, TypeTariff type)
-        {
-            var contract = new Contract(user, type);
-            return contract;
-        }
-
-
-
-
     }
 }

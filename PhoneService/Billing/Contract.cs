@@ -1,45 +1,38 @@
-﻿using PhoneService.Enum;
-using PhoneService.Interface;
-
-
-namespace PhoneService.Billing
+﻿namespace PhoneService
 {
-    internal class Contract : IContract
+    public class Contract : IContract
     {
+        static Random rnd = new Random();
 
-
-        public User User { get; private set; }
+        public Subscriber Subscriber { get; private set; }
         public int Number { get; private set; }
-        public Tariffs Tariffs { get; private set; }
+        public Tariff Tariff { get; private set; }
         private DateTime LastTariffUpdateDate;
-        static Random random = new();
 
 
-
-
-        public Contract(User user, TypeTariff tariffType)
+        public Contract(Subscriber subscriber, TariffType tariffType)
         {
-            User = user;
             LastTariffUpdateDate = DateTime.Now;
-            Tariffs = new Tariffs(tariffType);
-            Number = random.Next(1000000, 9999999);
-
+            Subscriber = subscriber;
+            Number = rnd.Next(1000000, 9999999);
+            Tariff = new Tariff(tariffType);
         }
 
-        public bool ChangeTariff(TypeTariff typeTariff)
+        public bool ChangeTariff(TariffType tariffType)
         {
             if (DateTime.Now.AddMonths(-1) >= LastTariffUpdateDate)
             {
                 LastTariffUpdateDate = DateTime.Now;
-                Tariffs = new Tariffs(typeTariff);
-                Console.WriteLine("Тариф Поменялся");
+                Tariff = new Tariff(tariffType);
+                Console.WriteLine("Tariff has changed!");
                 return true;
             }
             else
             {
-                Console.WriteLine("Жди до конца месяца");
+                Console.WriteLine("Цait until the end of the month!");
                 return false;
             }
+
         }
     }
 }

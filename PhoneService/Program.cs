@@ -1,32 +1,26 @@
-﻿using PhoneService.Billing;
-using PhoneService.Enum;
-using PhoneService.Interface;
-
-
-
-namespace PhoneService.ATE
+﻿namespace PhoneService
 {
-    internal class Program
+    class Program
     {
         static void Main(string[] args)
         {
-
-            IAte ate = new Ate();
-            ILog render = new SortedLogs();
-            IBilling bs = new Billing.Billing(ate);
+            IATE ate = new ATE();
 
 
-            IContract c1 = ate.RegisterContract(new User("Vasia"), Enum.TypeTariff.StartTariff);
-            IContract c2 = ate.RegisterContract(new User("Dima"), Enum.TypeTariff.StandardTariff);
-            IContract c3 = ate.RegisterContract(new User("Petya"), Enum.TypeTariff.UltraTariff);
+            IReportRender render = new ReportRender();
+            IBillingSystem bs = new BillingSystem(ate);
 
-            c1.User.BalanceAdd(50);
-            var t1 = ate.GetTerminal(c1);
-            var t2 = ate.GetTerminal(c2);
-            var t3 = ate.GetTerminal(c3);
-            t1.ConnectedPort();
-            t2.ConnectedPort();
-            t3.ConnectedPort();
+            IContract c1 = ate.RegisterContract(new Subscriber("Vasia", "Pupkin"), TariffType.Light);
+            IContract c2 = ate.RegisterContract(new Subscriber("Dima", "Pupkin"), TariffType.Light);
+            IContract c3 = ate.RegisterContract(new Subscriber("Petya", "Pupkin"), TariffType.Light);
+
+            c1.Subscriber.AddMoney(10);
+            var t1 = ate.GetNewTerminal(c1);
+            var t2 = ate.GetNewTerminal(c2);
+            var t3 = ate.GetNewTerminal(c3);
+            t1.ConnectToPort();
+            t2.ConnectToPort();
+            t3.ConnectToPort();
             t1.Call(t2.Number);
             Thread.Sleep(2000);
             t2.EndCall();
@@ -39,13 +33,14 @@ namespace PhoneService.ATE
 
             Console.WriteLine();
             Console.WriteLine("Sorted records:");
-            foreach (var item in render.SortCalls(bs.GetReport(t1.Number), Sorted.SortCall))
+            foreach (var item in render.SortCalls(bs.GetReport(t1.Number), TypeSort.SortByCallType))
             {
                 Console.WriteLine("Calls:\n Type {0} |\n Date: {1} |\n Duration: {2} | Cost: {3} | Telephone number: {4}",
-                    item.TypeCall, item.Date, item.Time.ToString("mm:ss"), item.Amount, item.Number);
+                    item.CallType, item.Date, item.Time.ToString("mm:ss"), item.Cost, item.Number);
             }
 
             Console.ReadKey();
+
 
         }
     }
