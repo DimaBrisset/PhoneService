@@ -1,16 +1,16 @@
 ﻿namespace PhoneService
 {
-    public class BillingSystem : IBillingSystem
+    public class Billing : IBilling
     {
-        private IStorage<CallInformation> _storage;
-        public BillingSystem(IStorage<CallInformation> storage)
+        private readonly IStorage<CallInformation> _storage;
+        public Billing(IStorage<CallInformation> storage)
         {
             _storage = storage;
         }
 
         public Report GetReport(int telephoneNumber)
         {
-            var calls = _storage.GetInfoList().
+            var calls = _storage.GetInformationAboutList().
                 Where(x => x.MyNumber == telephoneNumber || x.TargetNumber == telephoneNumber).
                 ToList();
             var report = new Report();
@@ -21,15 +21,15 @@
                 int number;
                 if (call.MyNumber == telephoneNumber)
                 {
-                    callType = CallType.OutgoingCall;
+                    callType = CallType.OutCall;
                     number = call.TargetNumber;
                 }
                 else
                 {
-                    callType = CallType.IncomingCall;
+                    callType = CallType.InCall;
                     number = call.MyNumber;
                 }
-                var record = new ReportRecord(callType, number, call.BeginCall, new DateTime((call.EndCall - call.BeginCall).Ticks), call.Cost); // TimeSpan.FromTicks((call.EndCall - call.BeginCall).Ticks) .TotalMinutes  
+                var record = new ReportRecord(callType, number, call.BeginCall, new DateTime((call.EndCall - call.BeginCall).Ticks), call.Cost);
                 report.AddRecord(record);
             }
             return report;

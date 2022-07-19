@@ -2,7 +2,7 @@
 {
     public enum CallState
     {
-        Answered,
-        Rejected
+       PickUpPhone,
+       NotPickUpPhone
     }
 }

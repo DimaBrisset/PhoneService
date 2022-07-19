@@ -28,17 +28,21 @@ namespace PhoneService
             return contract;
         }
 
-        public void CallingTo(object? sender, ICallingEventArgs e)
+
+
+
+        public void CallingTo(object? sender, ICallingEVENT e)
         {
             if ((_usersData.ContainsKey(e.TargetTelephoneNumber) && e.TargetTelephoneNumber != e.TelephoneNumber)
-                || e is EndCallEventArgs)
+                || e is EndEVENT)
             {
                 CallInformation? inf = null;
                 Port targetPort;
                 Port port;
                 int number = 0;
                 int targetNumber = 0;
-                if (e is EndCallEventArgs)
+
+                if (e is EndEVENT)
                 {
                     var callListFirst = _callList.First(x => x.Id.Equals(e.Id));
                     if (callListFirst.MyNumber == e.TelephoneNumber)
@@ -68,7 +72,7 @@ namespace PhoneService
                     var tuple = _usersData[number];
                     var targetTuple = _usersData[targetNumber];
 
-                    if (e is AnswerEventArgs answerArgs)
+                    if (e is EventAnswer answerArgs)
                     {
                         if (!answerArgs.Id.Equals(Guid.Empty) && _callList.Any(x => x.Id.Equals(answerArgs.Id)))
                         {
@@ -84,7 +88,13 @@ namespace PhoneService
                             targetPort.AnswerCall(answerArgs.TelephoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall);
                         }
                     }
-                    if (e is CallEventArgs args)
+
+
+
+
+
+
+                    if (e is CallEVENT args)
                     {
                         if (tuple.Item2.Subscriber.Money > tuple.Item2.Tariff.CostOfCallPerMinute)
                         {
@@ -118,14 +128,20 @@ namespace PhoneService
 
                         }
                     }
-                    if (e is EndCallEventArgs args1)
+
+
+
+
+
+
+                    if (e is EndEVENT args1)
                     {
                         inf = _callList.First(x => x.Id.Equals(args1.Id));
                         inf.EndCall = DateTime.Now;
                         var sumOfCall = tuple.Item2.Tariff.CostOfCallPerMinute * TimeSpan.FromTicks((inf.EndCall - inf.BeginCall).Ticks).TotalMinutes;
                         inf.Cost = (int)sumOfCall;
                         targetTuple.Item2.Subscriber.RemoveMoney(inf.Cost);
-                        targetPort.AnswerCall(args1.TelephoneNumber, args1.TargetTelephoneNumber, CallState.Rejected, inf.Id);
+                        targetPort.AnswerCall(args1.TelephoneNumber, args1.TargetTelephoneNumber, CallState.NotPickUpPhone, inf.Id);
                     }
                 }
             }
@@ -137,9 +153,11 @@ namespace PhoneService
             {
                 Console.WriteLine("You have calling a your number!!!");
             }
+
         }
 
-        public IList<CallInformation> GetInfoList()
+
+        public IList<CallInformation> GetInformationAboutList()
         {
             return _callList;
         }

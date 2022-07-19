@@ -11,25 +11,25 @@
             TariffType = type;
             switch (TariffType)
             {
-                case TariffType.Light:
+                case TariffType.Start:
                     {
-                        CostOfMonth = 10;
-                        LimitCallInMonth = 4;
-                        CostOfCallPerMinute = 3;
+                        CostOfMonth = 100;
+                        LimitCallInMonth = 10;
+                        CostOfCallPerMinute = 1;
                         break;
                     }
-                case TariffType.Standart:
+                case TariffType.Standard:
                     {
-                        CostOfMonth = 20;
-                        LimitCallInMonth = 8;
+                        CostOfMonth = 200;
+                        LimitCallInMonth = 20;
                         CostOfCallPerMinute = 2;
                         break;
                     }
-                case TariffType.Pro:
+                case TariffType.Ultra:
                     {
-                        CostOfMonth = 30;
-                        LimitCallInMonth = 12;
-                        CostOfCallPerMinute = 1;
+                        CostOfMonth = 300;
+                        LimitCallInMonth = 30;
+                        CostOfCallPerMinute = 3;
                         break;
                     }
                 default:

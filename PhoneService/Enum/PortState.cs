@@ -2,8 +2,8 @@
 {
     public enum PortState
     {
-        Connect,
         Disconnect,
+        Connect,
         InCall
     }
 }

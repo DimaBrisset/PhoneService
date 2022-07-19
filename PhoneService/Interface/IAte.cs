@@ -4,6 +4,6 @@
     {
         Terminal GetNewTerminal(IContract contract);
         IContract RegisterContract(Subscriber subscriber, TariffType type);
-        void CallingTo(object sender, ICallingEventArgs e);
+        void CallingTo(object sender, ICallingEVENT e);
     }
 }

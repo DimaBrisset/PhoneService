@@ -1,6 +1,6 @@
 ﻿namespace PhoneService
 {
-    public interface ICallingEventArgs
+    public interface ICallingEVENT
     {
         int TelephoneNumber { get; }
         int TargetTelephoneNumber { get; }

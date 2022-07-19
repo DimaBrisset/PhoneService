@@ -8,11 +8,11 @@
 
 
             IReportRender render = new ReportRender();
-            IBillingSystem bs = new BillingSystem(ate);
+            IBilling bs = new Billing(ate);
 
-            IContract c1 = ate.RegisterContract(new Subscriber("Vasia", "Pupkin"), TariffType.Light);
-            IContract c2 = ate.RegisterContract(new Subscriber("Dima", "Pupkin"), TariffType.Light);
-            IContract c3 = ate.RegisterContract(new Subscriber("Petya", "Pupkin"), TariffType.Light);
+            IContract c1 = ate.RegisterContract(new Subscriber("Vasia"), TariffType.Standard);
+            IContract c2 = ate.RegisterContract(new Subscriber("Dima"), TariffType.Standard);
+            IContract c3 = ate.RegisterContract(new Subscriber("Petya"), TariffType.Ultra);
 
             c1.Subscriber.AddMoney(10);
             var t1 = ate.GetNewTerminal(c1);
@@ -38,7 +38,7 @@
                 Console.WriteLine("Calls:\n Type {0} |\n Date: {1} |\n Duration: {2} | Cost: {3} | Telephone number: {4}",
                     item.CallType, item.Date, item.Time.ToString("mm:ss"), item.Cost, item.Number);
             }
-
+            
             Console.ReadKey();
 
 

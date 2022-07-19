@@ -2,7 +2,7 @@
 {
     public class Terminal
     {
-        private int _number;
+        private readonly int _number;
         public int Number
         {
             get
@@ -10,12 +10,12 @@
                 return _number;
             }
         }
-        private Port _terminalPort;
+        private readonly Port _terminalPort;
         private Guid _id;
 
-        public event EventHandler<CallEventArgs> CallEvent;
-        public event EventHandler<AnswerEventArgs> AnswerEvent;
-        public event EventHandler<EndCallEventArgs> EndCallEvent;
+        public event EventHandler<CallEVENT> ?CallEvent;
+        public event EventHandler<EventAnswer> ?AnswerEvent;
+        public event EventHandler<EndEVENT> ?EndCallEvent;
         public Terminal(int number, Port port)
         {
             this._number = number;
@@ -23,22 +23,17 @@
         }
         protected virtual void RaiseCallEvent(int targetNumber)
         {
-            if (CallEvent != null)
-                CallEvent(this, new CallEventArgs(_number, targetNumber));
+            CallEvent?.Invoke(this, new CallEVENT(_number, targetNumber));
         }
 
         protected virtual void RaiseAnswerEvent(int targetNumber, CallState state, Guid id)
         {
-            if (AnswerEvent != null)
-            {
-                AnswerEvent(this, new AnswerEventArgs(_number, targetNumber, state, id));
-            }
+            AnswerEvent?.Invoke(this, new EventAnswer(_number, targetNumber, state, id));
         }
 
         protected virtual void RaiseEndCallEvent(Guid id)
         {
-            if (EndCallEvent != null)
-                EndCallEvent(this, new EndCallEventArgs(id, _number));
+            EndCallEvent?.Invoke(this, new EndEVENT(id, _number));
         }
 
         public void Call(int targetNumber)
@@ -46,7 +41,7 @@
             RaiseCallEvent(targetNumber);
         }
 
-        public void TakeIncomingCall(object sender, CallEventArgs e)
+        public void TakeIncomingCall(object? sender, CallEVENT e)
         {
             bool flag = true;
             _id = e.Id;
@@ -59,7 +54,7 @@
                 {
                     flag = false;
                     Console.WriteLine();
-                    AnswerToCall(e.TelephoneNumber, CallState.Answered, e.Id);
+                    AnswerToCall(e.TelephoneNumber, CallState.PickUpPhone, e.Id);
                 }
                 else if (k == 'N' || k == 'n')
                 {
@@ -94,10 +89,10 @@
             RaiseEndCallEvent(_id);
         }
 
-        public void TakeAnswer(object sender, AnswerEventArgs e)
+        public void TakeAnswer(object? sender, EventAnswer e)
         {
             _id = e.Id;
-            if (e.StateInCall == CallState.Answered)
+            if (e.StateInCall == CallState.PickUpPhone)
             {
                 Console.WriteLine("Terminal with number: {0}, have answer on call a number: {1}", e.TelephoneNumber, e.TargetTelephoneNumber);
             }

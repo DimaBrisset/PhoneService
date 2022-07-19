@@ -29,7 +29,7 @@
             }
             else
             {
-                Console.WriteLine("Цait until the end of the month!");
+                Console.WriteLine("Wait until the end of the month!");
                 return false;
             }
 

@@ -2,8 +2,8 @@
 {
     public enum TariffType
     {
-        Light,
-        Standart,
-        Pro
+       Start,
+        Standard,
+        Ultra
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace PhoneService
 {
-    public interface IBillingSystem
+    public interface IBilling
     {
         Report GetReport(int telephoneNumber);
     }

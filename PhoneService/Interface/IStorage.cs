@@ -2,6 +2,6 @@
 {
     public interface IStorage<T>
     {
-        IList<T> GetInfoList();
+        IList<T> GetInformationAboutList();
     }
 }

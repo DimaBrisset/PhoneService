@@ -6,12 +6,12 @@
         public PortState State;
         public bool Flag;
 
-        public event EventHandler<CallEventArgs>? CallPortEvent;
-        public event EventHandler<AnswerEventArgs>? AnswerPortEvent;
-        public event EventHandler<CallEventArgs>? CallEvent;
-        public event EventHandler<AnswerEventArgs>? AnswerEvent;
+        public event EventHandler<CallEVENT>? CallPortEvent;
+        public event EventHandler<EventAnswer>? AnswerPortEvent;
+        public event EventHandler<CallEVENT>? CallEvent;
+        public event EventHandler<EventAnswer>? AnswerEvent;
 
-        public event EventHandler<EndCallEventArgs>? EndCallEvent;
+        public event EventHandler<EndEVENT>? EndCallEvent;
 
         public Port()
         {
@@ -46,29 +46,29 @@
 
         protected virtual void RaiseIncomingCallEvent(int number, int targetNumber)
         {
-            CallPortEvent?.Invoke(this, new CallEventArgs(number, targetNumber));
+            CallPortEvent?.Invoke(this, new CallEVENT(number, targetNumber));
         }
         protected virtual void RaiseIncomingCallEvent(int number, int targetNumber, Guid id)
         {
-            CallPortEvent?.Invoke(this, new CallEventArgs(number, targetNumber, id));
+            CallPortEvent?.Invoke(this, new CallEVENT(number, targetNumber, id));
         }
         protected virtual void RaiseAnswerCallEvent(int number, int targetNumber, CallState state)
         {
-            AnswerPortEvent?.Invoke(this, new AnswerEventArgs(number, targetNumber, state));
+            AnswerPortEvent?.Invoke(this, new EventAnswer(number, targetNumber, state));
         }
         protected virtual void RaiseAnswerCallEvent(int number, int targetNumber, CallState state, Guid id)
         {
-            AnswerPortEvent?.Invoke(this, new AnswerEventArgs(number, targetNumber, state, id));
+            AnswerPortEvent?.Invoke(this, new EventAnswer(number, targetNumber, state, id));
         }
 
         protected virtual void RaiseCallingToEvent(int number, int targetNumber)
         {
-            CallEvent?.Invoke(this, new CallEventArgs(number, targetNumber));
+            CallEvent?.Invoke(this, new CallEVENT(number, targetNumber));
         }
 
-        protected virtual void RaiseAnswerToEvent(AnswerEventArgs eventArgs)
+        protected virtual void RaiseAnswerToEvent(EventAnswer eventArgs)
         {
-            AnswerEvent?.Invoke(this, new AnswerEventArgs(
+            AnswerEvent?.Invoke(this, new EventAnswer(
     eventArgs.TelephoneNumber,
     eventArgs.TargetTelephoneNumber,
     eventArgs.StateInCall,
@@ -77,20 +77,20 @@
 
         protected virtual void RaiseEndCallEvent(Guid id, int number)
         {
-            EndCallEvent?.Invoke(this, new EndCallEventArgs(id, number));
+            EndCallEvent?.Invoke(this, new EndEVENT(id, number));
         }
 
-        private void CallingTo(object? sender, CallEventArgs e)
+        private void CallingTo(object? sender, CallEVENT e)
         {
             RaiseCallingToEvent(e.TelephoneNumber, e.TargetTelephoneNumber);
         }
 
-        private void AnswerTo(object? sender, AnswerEventArgs e)
+        private void AnswerTo(object? sender, EventAnswer e)
         {
             RaiseAnswerToEvent(e);
         }
 
-        private void EndCall(object? sender, EndCallEventArgs e)
+        private void EndCall(object? sender, EndEVENT e)
         {
             RaiseEndCallEvent(e.Id, e.TelephoneNumber);
         }

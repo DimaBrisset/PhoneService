@@ -3,13 +3,13 @@
     public class Subscriber
     {
         public string FirstName { get; private set; }
-        public string LastName { get; private set; }
+   
         public int Money { get; private set; }
 
-        public Subscriber(string firstName, string lastName)
+        public Subscriber(string firstName)
         {
             FirstName = firstName;
-            LastName = lastName;
+         
             Money = 30;
         }
 

@@ -8,10 +8,15 @@
         }
         public void Render(Report report)
         {
+    
             foreach (var record in report.GetRecords())
             {
-                Console.WriteLine("Calls:\n Type {0} |\n Date: {1} |\n Duration: {2} | Cost: {3} | Telephone number: {4}",
-                    record.CallType, record.Date, record.Time.ToString("mm:ss"), record.Cost, record.Number);
+                Console.WriteLine($"Calls:\n Type {record.CallType} |\n Date: {record.Date} |\n Duration: {record.Time.ToString("mm:ss")} | Cost: {record.Cost} | Telephone number: {record.Number}");
+                
+
+
+
+
             }
         }
         public IEnumerable<ReportRecord> SortCalls(Report report, TypeSort sortType)
