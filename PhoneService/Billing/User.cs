@@ -1,12 +1,12 @@
 ﻿namespace PhoneService
 {
-    public class Subscriber
+    public class User
     {
         public string FirstName { get; private set; }
    
         public int Money { get; private set; }
 
-        public Subscriber(string firstName)
+        public User(string firstName)
         {
             FirstName = firstName;
          

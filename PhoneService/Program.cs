@@ -10,11 +10,11 @@
             IReportRender render = new ReportRender();
             IBilling bs = new Billing(ate);
 
-            IContract c1 = ate.RegisterContract(new Subscriber("Vasia"), TariffType.Standard);
-            IContract c2 = ate.RegisterContract(new Subscriber("Dima"), TariffType.Standard);
-            IContract c3 = ate.RegisterContract(new Subscriber("Petya"), TariffType.Ultra);
+            IContract c1 = ate.RegisterContract(new User("Vasia"), TariffType.Standard);
+            IContract c2 = ate.RegisterContract(new User("Dima"), TariffType.Standard);
+            IContract c3 = ate.RegisterContract(new User("Petya"), TariffType.Ultra);
 
-            c1.Subscriber.AddMoney(10);
+            c1.User.AddMoney(10);
             var t1 = ate.GetNewTerminal(c1);
             var t2 = ate.GetNewTerminal(c2);
             var t3 = ate.GetNewTerminal(c3);

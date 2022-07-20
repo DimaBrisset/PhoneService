@@ -45,7 +45,7 @@
         {
             bool flag = true;
             _id = e.Id;
-            Console.WriteLine("Have incoming Call at number: {0} to terminal {1}", e.TelephoneNumber, e.TargetTelephoneNumber);
+            Console.WriteLine("Have incoming Call at number: {0} to terminal {1}", e.PhoneNumber, e.TargetTelephoneNumber);
             while (flag == true)
             {
                 Console.WriteLine("Answer? Y/N");
@@ -54,7 +54,7 @@
                 {
                     flag = false;
                     Console.WriteLine();
-                    AnswerToCall(e.TelephoneNumber, CallState.PickUpPhone, e.Id);
+                    AnswerToCall(e.PhoneNumber, CallState.PickUpPhone, e.Id);
                 }
                 else if (k == 'N' || k == 'n')
                 {
@@ -94,11 +94,11 @@
             _id = e.Id;
             if (e.StateInCall == CallState.PickUpPhone)
             {
-                Console.WriteLine("Terminal with number: {0}, have answer on call a number: {1}", e.TelephoneNumber, e.TargetTelephoneNumber);
+                Console.WriteLine("Terminal with number: {0}, have answer on call a number: {1}", e.PhoneNumber, e.TargetTelephoneNumber);
             }
             else
             {
-                Console.WriteLine("Terminal with number: {0}, have rejected call", e.TelephoneNumber);
+                Console.WriteLine("Terminal with number: {0}, have rejected call", e.PhoneNumber);
             }
         }
     }

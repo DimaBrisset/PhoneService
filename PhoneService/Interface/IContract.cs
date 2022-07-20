@@ -2,7 +2,7 @@
 {
     public interface IContract
     {
-        Subscriber Subscriber { get; }
+        User User { get; }
         int Number { get; }
         Tariff Tariff { get; }
         bool ChangeTariff(TariffType tariffType);

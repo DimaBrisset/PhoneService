@@ -69,7 +69,7 @@
         protected virtual void RaiseAnswerToEvent(EventAnswer eventArgs)
         {
             AnswerEvent?.Invoke(this, new EventAnswer(
-    eventArgs.TelephoneNumber,
+    eventArgs.PhoneNumber,
     eventArgs.TargetTelephoneNumber,
     eventArgs.StateInCall,
     eventArgs.Id));
@@ -82,7 +82,7 @@
 
         private void CallingTo(object? sender, CallEVENT e)
         {
-            RaiseCallingToEvent(e.TelephoneNumber, e.TargetTelephoneNumber);
+            RaiseCallingToEvent(e.PhoneNumber, e.TargetTelephoneNumber);
         }
 
         private void AnswerTo(object? sender, EventAnswer e)
@@ -92,7 +92,7 @@
 
         private void EndCall(object? sender, EndEVENT e)
         {
-            RaiseEndCallEvent(e.Id, e.TelephoneNumber);
+            RaiseEndCallEvent(e.Id, e.PhoneNumber);
         }
 
         public void IncomingCall(int number, int targetNumber)

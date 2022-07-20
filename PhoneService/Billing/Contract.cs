@@ -4,16 +4,19 @@
     {
         static Random rnd = new Random();
 
-        public Subscriber Subscriber { get; private set; }
+        public User User { get; private set; }
         public int Number { get; private set; }
         public Tariff Tariff { get; private set; }
+
+      
+
         private DateTime LastTariffUpdateDate;
 
 
-        public Contract(Subscriber subscriber, TariffType tariffType)
+        public Contract(User user, TariffType tariffType)
         {
             LastTariffUpdateDate = DateTime.Now;
-            Subscriber = subscriber;
+            User = user;
             Number = rnd.Next(1000000, 9999999);
             Tariff = new Tariff(tariffType);
         }

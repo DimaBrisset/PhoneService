@@ -22,7 +22,7 @@ namespace PhoneService
             return newTerminal;
         }
 
-        public IContract RegisterContract(Subscriber subscriber, TariffType type)
+        public IContract RegisterContract(User subscriber, TariffType type)
         {
             var contract = new Contract(subscriber, type);
             return contract;
@@ -33,7 +33,7 @@ namespace PhoneService
 
         public void CallingTo(object? sender, ICallingEVENT e)
         {
-            if ((_usersData.ContainsKey(e.TargetTelephoneNumber) && e.TargetTelephoneNumber != e.TelephoneNumber)
+            if ((_usersData.ContainsKey(e.TargetTelephoneNumber) && e.TargetTelephoneNumber != e.PhoneNumber)
                 || e is EndEVENT)
             {
                 CallInformation? inf = null;
@@ -45,7 +45,7 @@ namespace PhoneService
                 if (e is EndEVENT)
                 {
                     var callListFirst = _callList.First(x => x.Id.Equals(e.Id));
-                    if (callListFirst.MyNumber == e.TelephoneNumber)
+                    if (callListFirst.MyNumber == e.PhoneNumber)
                     {
                         targetPort = _usersData[callListFirst.TargetNumber].Item1;
                         port = _usersData[callListFirst.MyNumber].Item1;
@@ -63,9 +63,9 @@ namespace PhoneService
                 else
                 {
                     targetPort = _usersData[e.TargetTelephoneNumber].Item1;
-                    port = _usersData[e.TelephoneNumber].Item1;
+                    port = _usersData[e.PhoneNumber].Item1;
                     targetNumber = e.TargetTelephoneNumber;
-                    number = e.TelephoneNumber;
+                    number = e.PhoneNumber;
                 }
                 if (targetPort.State == PortState.Connect && port.State == PortState.Connect)
                 {
@@ -81,11 +81,11 @@ namespace PhoneService
 
                         if (inf != null)
                         {
-                            targetPort.AnswerCall(answerArgs.TelephoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall, inf.Id);
+                            targetPort.AnswerCall(answerArgs.PhoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall, inf.Id);
                         }
                         else
                         {
-                            targetPort.AnswerCall(answerArgs.TelephoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall);
+                            targetPort.AnswerCall(answerArgs.PhoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall);
                         }
                     }
 
@@ -96,14 +96,14 @@ namespace PhoneService
 
                     if (e is CallEVENT args)
                     {
-                        if (tuple.Item2.Subscriber.Money > tuple.Item2.Tariff.CostOfCallPerMinute)
+                        if (tuple.Item2.User.Money > tuple.Item2.Tariff.CostOfCallPerMinute)
                         {
                             var callArgs = args;
 
                             if (callArgs.Id.Equals(Guid.Empty))
                             {
                                 inf = new CallInformation(
-                                    callArgs.TelephoneNumber,
+                                    callArgs.PhoneNumber,
                                     callArgs.TargetTelephoneNumber,
                                     DateTime.Now);
                                 _callList.Add(inf);
@@ -115,16 +115,16 @@ namespace PhoneService
                             }
                             if (inf != null)
                             {
-                                targetPort.IncomingCall(callArgs.TelephoneNumber, callArgs.TargetTelephoneNumber, inf.Id);
+                                targetPort.IncomingCall(callArgs.PhoneNumber, callArgs.TargetTelephoneNumber, inf.Id);
                             }
                             else
                             {
-                                targetPort.IncomingCall(callArgs.TelephoneNumber, callArgs.TargetTelephoneNumber);
+                                targetPort.IncomingCall(callArgs.PhoneNumber, callArgs.TargetTelephoneNumber);
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Terminal with number {0} is not enough money in the account!", e.TelephoneNumber);
+                            Console.WriteLine("Terminal with number {0} is not enough money in the account!", e.PhoneNumber);
 
                         }
                     }
@@ -140,8 +140,8 @@ namespace PhoneService
                         inf.EndCall = DateTime.Now;
                         var sumOfCall = tuple.Item2.Tariff.CostOfCallPerMinute * TimeSpan.FromTicks((inf.EndCall - inf.BeginCall).Ticks).TotalMinutes;
                         inf.Cost = (int)sumOfCall;
-                        targetTuple.Item2.Subscriber.RemoveMoney(inf.Cost);
-                        targetPort.AnswerCall(args1.TelephoneNumber, args1.TargetTelephoneNumber, CallState.NotPickUpPhone, inf.Id);
+                        targetTuple.Item2.User.RemoveMoney(inf.Cost);
+                        targetPort.AnswerCall(args1.PhoneNumber, args1.TargetTelephoneNumber, CallState.NotPickUpPhone, inf.Id);
                     }
                 }
             }
