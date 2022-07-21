@@ -32,6 +32,10 @@
             t1.EndCall();
 
             Console.WriteLine();
+            
+
+
+
             Console.WriteLine("Sorted records:");
             foreach (var item in render.SortCalls(bs.GetReport(t1.Number), TypeSort.SortByCallType))
             {
