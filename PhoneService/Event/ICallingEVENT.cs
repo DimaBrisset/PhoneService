@@ -3,7 +3,7 @@
     public interface ICallingEVENT
     {
         int PhoneNumber { get; }
-        int TargetTelephoneNumber { get; }
+        int TargetPhoneNumber { get; }
         Guid Id { get; }
     }
 }

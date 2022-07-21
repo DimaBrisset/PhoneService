@@ -4,7 +4,7 @@
     {
         public Guid Id { get; private set; }
         public int PhoneNumber { get; private set; }
-        public int TargetTelephoneNumber { get; private set; }
+        public int TargetPhoneNumber { get; private set; }
 
         public EndEVENT(Guid id, int number)
         {

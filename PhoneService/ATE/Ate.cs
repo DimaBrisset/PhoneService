@@ -33,7 +33,7 @@ namespace PhoneService
 
         public void CallingTo(object? sender, ICallingEVENT e)
         {
-            if ((_usersData.ContainsKey(e.TargetTelephoneNumber) && e.TargetTelephoneNumber != e.PhoneNumber)
+            if ((_usersData.ContainsKey(e.TargetPhoneNumber) && e.TargetPhoneNumber != e.PhoneNumber)
                 || e is EndEVENT)
             {
                 CallInformation? inf = null;
@@ -62,9 +62,9 @@ namespace PhoneService
                 }
                 else
                 {
-                    targetPort = _usersData[e.TargetTelephoneNumber].Item1;
+                    targetPort = _usersData[e.TargetPhoneNumber].Item1;
                     port = _usersData[e.PhoneNumber].Item1;
-                    targetNumber = e.TargetTelephoneNumber;
+                    targetNumber = e.TargetPhoneNumber;
                     number = e.PhoneNumber;
                 }
                 if (targetPort.State == PortState.Connect && port.State == PortState.Connect)
@@ -81,11 +81,11 @@ namespace PhoneService
 
                         if (inf != null)
                         {
-                            targetPort.AnswerCall(answerArgs.PhoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall, inf.Id);
+                            targetPort.AnswerCall(answerArgs.PhoneNumber, answerArgs.TargetPhoneNumber, answerArgs.StateInCall, inf.Id);
                         }
                         else
                         {
-                            targetPort.AnswerCall(answerArgs.PhoneNumber, answerArgs.TargetTelephoneNumber, answerArgs.StateInCall);
+                            targetPort.AnswerCall(answerArgs.PhoneNumber, answerArgs.TargetPhoneNumber, answerArgs.StateInCall);
                         }
                     }
 
@@ -104,7 +104,7 @@ namespace PhoneService
                             {
                                 inf = new CallInformation(
                                     callArgs.PhoneNumber,
-                                    callArgs.TargetTelephoneNumber,
+                                    callArgs.TargetPhoneNumber,
                                     DateTime.Now);
                                 _callList.Add(inf);
                             }
@@ -115,11 +115,11 @@ namespace PhoneService
                             }
                             if (inf != null)
                             {
-                                targetPort.IncomingCall(callArgs.PhoneNumber, callArgs.TargetTelephoneNumber, inf.Id);
+                                targetPort.IncomingCall(callArgs.PhoneNumber, callArgs.TargetPhoneNumber, inf.Id);
                             }
                             else
                             {
-                                targetPort.IncomingCall(callArgs.PhoneNumber, callArgs.TargetTelephoneNumber);
+                                targetPort.IncomingCall(callArgs.PhoneNumber, callArgs.TargetPhoneNumber);
                             }
                         }
                         else
@@ -141,11 +141,11 @@ namespace PhoneService
                         var sumOfCall = tuple.Item2.Tariff.CostOfCallPerMinute * TimeSpan.FromTicks((inf.EndCall - inf.BeginCall).Ticks).TotalMinutes;
                         inf.Cost = (int)sumOfCall;
                         targetTuple.Item2.User.RemoveMoney(inf.Cost);
-                        targetPort.AnswerCall(args1.PhoneNumber, args1.TargetTelephoneNumber, CallState.NotPickUpPhone, inf.Id);
+                        targetPort.AnswerCall(args1.PhoneNumber, args1.TargetPhoneNumber, CallState.NotPickUpPhone, inf.Id);
                     }
                 }
             }
-            else if (!_usersData.ContainsKey(e.TargetTelephoneNumber))
+            else if (!_usersData.ContainsKey(e.TargetPhoneNumber))
             {
                 Console.WriteLine("You have calling a non-existent number!!!");
             }

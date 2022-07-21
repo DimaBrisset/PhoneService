@@ -70,7 +70,7 @@
         {
             AnswerEvent?.Invoke(this, new EventAnswer(
     eventArgs.PhoneNumber,
-    eventArgs.TargetTelephoneNumber,
+    eventArgs.TargetPhoneNumber,
     eventArgs.StateInCall,
     eventArgs.Id));
         }
@@ -82,7 +82,7 @@
 
         private void CallingTo(object? sender, CallEVENT e)
         {
-            RaiseCallingToEvent(e.PhoneNumber, e.TargetTelephoneNumber);
+            RaiseCallingToEvent(e.PhoneNumber, e.TargetPhoneNumber);
         }
 
         private void AnswerTo(object? sender, EventAnswer e)

@@ -13,9 +13,9 @@
         private readonly Port _terminalPort;
         private Guid _id;
 
-        public event EventHandler<CallEVENT> ?CallEvent;
-        public event EventHandler<EventAnswer> ?AnswerEvent;
-        public event EventHandler<EndEVENT> ?EndCallEvent;
+        public event EventHandler<CallEVENT>? CallEvent;
+        public event EventHandler<EventAnswer>? AnswerEvent;
+        public event EventHandler<EndEVENT>? EndCallEvent;
         public Terminal(int number, Port port)
         {
             this._number = number;
@@ -45,7 +45,7 @@
         {
             bool flag = true;
             _id = e.Id;
-            Console.WriteLine("Have incoming Call at number: {0} to terminal {1}", e.PhoneNumber, e.TargetTelephoneNumber);
+            Console.WriteLine($"Have incoming Call at number: {e.PhoneNumber} to terminal {e.TargetPhoneNumber}");
             while (flag == true)
             {
                 Console.WriteLine("Answer? Y/N");
@@ -94,12 +94,13 @@
             _id = e.Id;
             if (e.StateInCall == CallState.PickUpPhone)
             {
-                Console.WriteLine("Terminal with number: {0}, have answer on call a number: {1}", e.PhoneNumber, e.TargetTelephoneNumber);
+                Console.WriteLine($"Terminal with number: {e.PhoneNumber}, have answer on call a number: {e.TargetPhoneNumber}");
             }
             else
             {
-                Console.WriteLine("Terminal with number: {0}, have rejected call", e.PhoneNumber);
+                Console.WriteLine($"Terminal with number: {e.PhoneNumber}, have rejected call");
             }
+            
         }
     }
 }
